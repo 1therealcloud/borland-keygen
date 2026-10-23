@@ -1,0 +1,15 @@
+#ifndef HYPERION_RESOURCE_H
+#define HYPERION_RESOURCE_H
+
+#define IDD_KEYGEN 103
+#define IDI_MAIN 105
+#define IDB_BANNER 134
+
+#define IDC_BANNER 10
+#define IDC_GENERATE 1
+#define IDC_SERIAL 1000
+#define IDC_AUTH 1001
+#define IDC_REG 1002
+#define IDC_ACTIVATION 1003
+
+#endif

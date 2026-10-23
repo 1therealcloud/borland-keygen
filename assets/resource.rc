@@ -1,0 +1,27 @@
+#include <windows.h>
+#include "resource.h"
+
+// original dialog: 10 controls, 210 x 179 dialog units.
+// owner-drawn bitmap fills the banner area at any dpi.
+IDD_KEYGEN DIALOG 0, 0, 210, 179
+STYLE 0x90CA0A44
+CAPTION "Borland C++ Builder 6 [xor37h/xbadc0de]"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL "Generate",             IDC_GENERATE,  "Button", 0x50010001, 158, 133,  47, 12
+    CONTROL "",                    IDC_BANNER,    "Static", WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW, 4, 4, 201, 110
+    CONTROL "Serial Number:",      -1,            "Static", 0x50020000,  15, 120,  50,  8
+    CONTROL "",                    IDC_SERIAL,    "Edit",   0x50810010,  64, 118, 141, 12
+    CONTROL "Authorization Key:",  -1,            "Static", 0x50020000,   5, 135,  60,  8
+    CONTROL "",                    IDC_AUTH,      "Edit",   0x50810010,  64, 133,  89, 12
+    CONTROL "Registration Code:",  -1,            "Static", 0x50020000,   4, 150,  60,  8
+    CONTROL "",                    IDC_REG,       "Edit",   0x50810080,  64, 148, 141, 12
+    CONTROL "Activation Key:",     -1,            "Static", 0x50020000,  14, 165,  50,  8
+    CONTROL "",                    IDC_ACTIVATION, "Edit",   0x50810800,  64, 163, 141, 12
+END
+
+IDI_MAIN   ICON   "assets\\icon.ico"
+IDB_BANNER BITMAP "assets\\banner.bmp"
+
+// enable high dpi awareness before the first window is created.
+1 24 "assets\\app.manifest"
