@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <shellapi.h>
+#include <string.h>
 
 #include "keygen.h"
 
@@ -19,11 +20,17 @@ static const char prompt_short[] = "Enter all six Registration Code digits...";
 static char dialog_serial[17];
 static char dialog_authorization[8];
 static char dialog_registration[7];
+static int setting_generated_fields;
 
 static void update_activation(HWND dialog)
 {
     char activation[16];
     UINT length;
+
+    /* always use the current edit control contents, not previous buffer tails. */
+    memset(dialog_serial, 0, sizeof(dialog_serial));
+    memset(dialog_authorization, 0, sizeof(dialog_authorization));
+    memset(dialog_registration, 0, sizeof(dialog_registration));
 
     GetDlgItemTextA(dialog, IDC_SERIAL, dialog_serial, sizeof(dialog_serial));
     GetDlgItemTextA(dialog, IDC_AUTH, dialog_authorization, sizeof(dialog_authorization));
@@ -47,11 +54,22 @@ static void generate(HWND dialog)
 {
     char serial[17];
     char authorization[8];
-    kg_u32 random = kg_next_random((kg_u32)GetTickCount(), 0x000fffeeUL);
 
-    kg_make_serial(random, serial, authorization);
-    SetDlgItemTextA(dialog, IDC_SERIAL, serial);
-    SetDlgItemTextA(dialog, IDC_AUTH, authorization);
+    GetDlgItemTextA(dialog, IDC_SERIAL, serial, sizeof(serial));
+    GetDlgItemTextA(dialog, IDC_AUTH, authorization, sizeof(authorization));
+
+    /* preserve manually entered values. generate a pair only when both are empty. */
+    if (!serial[0] && !authorization[0])
+    {
+        kg_u32 random = kg_next_random((kg_u32)GetTickCount(), 0x000fffeeUL);
+        kg_make_serial(random, serial, authorization);
+
+        setting_generated_fields = 1;
+        SetDlgItemTextA(dialog, IDC_SERIAL, serial);
+        SetDlgItemTextA(dialog, IDC_AUTH, authorization);
+        setting_generated_fields = 0;
+    }
+
     update_activation(dialog);
 }
 
@@ -128,9 +146,11 @@ static INT_PTR CALLBACK dialog_proc(HWND dialog, UINT message, WPARAM wparam, LP
         case IDC_GENERATE:
             generate(dialog);
             break;
+        case IDC_SERIAL:
+        case IDC_AUTH:
         case IDC_REG:
-            /* the original handles every WM_COMMAND from registration. */
-            update_activation(dialog);
+            if (HIWORD(wparam) == EN_CHANGE && !setting_generated_fields)
+                update_activation(dialog);
             break;
         case IDC_BANNER:
             ShellExecuteA(NULL, NULL, "http://www.borland.com/bcppbuilder/", NULL, NULL, SW_HIDE);
